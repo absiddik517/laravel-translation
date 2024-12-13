@@ -47,9 +47,13 @@
                             <label for="{{ $lang }}" class="col-md-4 col-form-label text-md-right">{{ strtoupper($lang) }}</label>
 
                             <div class="col-md-6">
-                                <textarea id="{{ $lang }}" type="text" class="form-control @error($lang) is-invalid @enderror" name="{{ $lang }}">
-                                  {{ old($lang) ?? ucfirst(str_replace('_', ' ', $key)) }}
+                                @if(config('translation.form_field') === "input")
+                                <input type="text" class="form-control" id="{{ $lang }}" value="{{ old($lang) ?? $translations[$lang] }}">
+                                @else
+                                <textarea id="{{ $lang }}" class="form-control @error($lang) is-invalid @enderror" name="{{ $lang }}">
+                                  {{ old($lang) ?? $translations[$lang] }}
                                 </textarea>
+                                @endif
 
                                 @error($lang)
                                     <span class="invalid-feedback" role="alert">

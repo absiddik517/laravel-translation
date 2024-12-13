@@ -12,7 +12,7 @@ return [
   |
   */
   'languages' => [
-    'en', 'bn'
+    'en', 'bn', 'hi'
   ],
   
   /*
@@ -35,7 +35,7 @@ return [
   | looking for missing translations.
   |
   */
-  'lang_path' => resource_path().'/lang',
+  'lang_path' => base_path().'/language',
   /*
   |--------------------------------------------------------------------------
   | List of paths to be scanned.
@@ -111,6 +111,17 @@ return [
   |
   */
   'ui_url' => 'lang',
+  
+  /*
+  |--------------------------------------------------------------------------
+  | UI from field
+  |--------------------------------------------------------------------------
+  |
+  | Define the form field.
+  | Between "input", "textarea"
+  |
+  */
+  'form_field' => 'textarea',
 
   
   

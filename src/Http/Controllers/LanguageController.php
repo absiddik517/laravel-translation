@@ -108,15 +108,21 @@ class LanguageController extends Controller
   }
   
   public function addFromStudy($key){
+    $scanner = new Scanner();
     $expload = explode('.', $key, 2);
     //dd($expload);
     $file = count($expload) == 2 ? $expload[0] : null;
     $returnkey = count($expload) == 2 ? $expload[1] : $key;
-    
+    $translations = [];
+    foreach (config('translation.languages') as $language){
+      $translations[$language] = $language == "en" ? $returnkey : $scanner->translate($returnkey, $language);
+    }
+    //dd($translations);
   
     return view('translation::add', [
       'key' => $returnkey,
-      'file' => $file
+      'file' => $file,
+      "translations" => $translations
     ]);
   }
   

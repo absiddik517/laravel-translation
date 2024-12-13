@@ -121,6 +121,7 @@ class Scanner
 
   public function getTranslationArray(){
     $path = config('translation.lang_path').'/'.config('translation.translation_priority');
+    \File::ensureDirectoryExists($path);
     $files = $this->collapseArray($this->scan_dir($path));
     $trans = [];
     foreach ($files as $file){
@@ -146,7 +147,9 @@ class Scanner
       }
     }
     
-    $global = json_decode(file_get_contents(config('translation.lang_path').'/'.config('translation.translation_priority').'.json'));
+    $json_path = config('translation.lang_path').'/'.config('translation.translation_priority').'.json';
+    $this->createFileIfNotExist($json_path);
+    $global = json_decode(file_get_contents($json_path));
     foreach ($global as $key => $value){
       $trans[] = [
         'path' => config('translation.translation_priority').'.json',
@@ -300,6 +303,7 @@ class Scanner
     foreach (config('translation.languages') as $lang){
       if($is_json){
         $file = config('translation.lang_path').'/'.$lang.'.json';
+        $this->createFileIfNotExist($file);
         $data[$lang] = (array) json_decode(file_get_contents($file));
       }else{
         $file = config('translation.lang_path').'/'.$lang.'/'.$req->file.'.php';
@@ -328,8 +332,24 @@ class Scanner
     return $data;
   }
   
+  public function translate(String $text, String $targetLang = "bn", String $sourceLang = "en"){
+    $ch = curl_init();
+    $url = "https://api.mymemory.translated.net/get?q=" . urlencode($text) . "&langpair=$sourceLang|$targetLang";
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    
+    $response = curl_exec($ch);
+    curl_close($ch);
+    
+    $result = json_decode($response, true);
+    return $result['responseStatus'] === 200 ? $result["responseData"]["translatedText"] : $text;
+    echo $result['responseData']['translatedText']; // Outputs: হ্যালো, আপনি কেমন আছেন?
+
+  }
+  
   private function createFileIfNotExist($file){
     if(!\File::isFile($file)){
+      \File::ensureDirectoryExists(dirname($file));
       $myfile = fopen($file, "w");
       fclose($myfile);
       $content = \File::extension($file) == "php" ? "<?php \n return [];" : "{}";
@@ -347,9 +367,11 @@ class Scanner
       if($extension == 'json'){
         $is_json = true;
         $file = config('translation.lang_path').'/'.$lang.'.json';
+        $this->createFileIfNotExist($file);
         $data[$lang] = (array) json_decode(file_get_contents($file));
       }else{
         $file = config('translation.lang_path').'/'.$lang.'/'.$filename;
+        $this->createFileIfNotExist($file);
         $data[$lang] = include($file);
       }
       
@@ -360,12 +382,7 @@ class Scanner
         $data[$lang][$key] = trim($req->input($lang));
       }
       
-      if($is_json) {
-        $content = $this->processJsonContent($data[$lang], true);
-      }else{
-        $content = $this->processPhpContent($data[$lang], true);
-      }
-      
+      $content = $is_json ? $this->processJsonContent($data[$lang], true) : $this->processPhpContent($data[$lang], true);
       
       \File::put($file, $content);
     }
