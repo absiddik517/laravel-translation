@@ -67,6 +67,7 @@ class Scanner
   }
   
   private function scan_dir($dir){
+      \File::ensureDirectoryExists($dir);
       $files = [];
       $ffs = scandir($dir);
       unset($ffs[array_search('.', $ffs, true)]);
