@@ -1,0 +1,28 @@
+{
+    "name": "siddik/laravel-translation",
+    "description": "Simple package to manage laravel translation",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Siddik\\LaravelTranslation\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "A.B. Siddik",
+            "email": "absiddik517@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Siddik\\LaravelTranslation\\TranslationServiceProvider"
+            ],
+            "aliases": {
+                "Translation": "Siddik\\LaravelTranslation\\Facade"
+            }
+        }
+    }
+}
